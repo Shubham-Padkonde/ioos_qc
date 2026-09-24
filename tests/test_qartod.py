@@ -462,6 +462,30 @@ class QartodClimatologyPeriodTest(unittest.TestCase):
     def test_climatology_test_periods_quarter(self):
         self._run_test((0, 1), "quarter")
 
+    def test_climatology_test_periods_missing_values(self):
+        # Missing values inside the time span must stay MISSING for every
+        # period type, not be overwritten with GOOD.
+        times = np.array(
+            ["2011-02-02", "2011-02-03", "2011-02-04"],
+            dtype="datetime64[ns]",
+        )
+        values = np.array([11, np.nan, 25], dtype=np.float64)
+        for tspan, period in [
+            ((0, 3), "month"),
+            ((0, 12), "weekofyear"),
+            ((0, 90), "dayofyear"),
+            ((0, 1), "quarter"),
+        ]:
+            cc = qartod.ClimatologyConfig()
+            cc.add(vspan=(10, 20), tspan=tspan, period=period)
+            results = qartod.climatology_test(
+                config=cc,
+                tinp=times,
+                inp=values,
+                zinp=np.full(3, np.nan),
+            )
+            npt.assert_array_equal(results, np.ma.array([1, 9, 3]), err_msg=period)
+
 
 class QartodClimatologyPeriodFullCoverageTest(unittest.TestCase):
     # Test that we can define climatology periods across the whole year,

@@ -683,14 +683,8 @@ class ClimatologyConfig:
                 # If a period is defined, extract the attribute from the
                 # pd.DatetimeIndex object before comparison. The min and max
                 # values are in this period unit already.
-                if m.period in WEEK_PERIODS:
-                    # The weekofyear accessor was deprecated
-                    tinp_copy = pd.Index(
-                        tinp.isocalendar().week,
-                        dtype="int64",
-                    )
-                else:
-                    tinp_copy = getattr(tinp, m.period).to_series()
+                # The weekofyear accessor was deprecated
+                tinp_copy = pd.Index(tinp.isocalendar().week, dtype="int64") if m.period in WEEK_PERIODS else getattr(tinp, m.period)
             else:
                 # If a period isn't defined, make a new Timestamp object
                 # to align with the above name 'tinp_copy'
