@@ -1048,6 +1048,7 @@ def flat_line_test(
 
     # if we have fewer than 3 points, we can't run the test, so everything passes
     min_inp_size = 3
+    min_repeated_values = 2
     if len(inp) < min_inp_size:
         return flag_arr.reshape(original_shape)
 
@@ -1075,9 +1076,15 @@ def flat_line_test(
         data_min = np.min(window, 1)
         data_max = np.max(window, 1)
         data_range = np.abs(data_max - data_min)
+        data_count = np.ma.count(window, 1)
 
-        # find data ranges that are within threshold and flag them
-        test_results = np.ma.filled(data_range < tolerance, fill_value=False)
+        # find data ranges that are within threshold and flag them. A value can
+        # only be repeated if the window holds at least two valid values; a lone
+        # value between missing ones has a range of 0 and would always be flagged.
+        test_results = np.ma.filled(
+            (data_range < tolerance) & (data_count >= min_repeated_values),
+            fill_value=False,
+        )
         # data points before end of first window should pass
         n_fill = min(len(inp), count)
         test_results = np.insert(test_results, 0, np.full((n_fill,), fill_value=False))

@@ -1733,6 +1733,19 @@ class QartodFlatLineTest(unittest.TestCase):
             )
             npt.assert_array_equal(result, expected)
 
+    def test_flat_line_lone_value_between_missing(self):
+        # A single valid value surrounded by missing values is not a flat line.
+        arr = [np.nan] * 6 + [5.0] + [np.nan] * 7
+        expected = [9] * 6 + [1] + [9] * 7
+        result = qartod.flat_line_test(
+            inp=arr,
+            tinp=self.times,
+            suspect_threshold=self.suspect_threshold,
+            fail_threshold=self.fail_threshold,
+            tolerance=self.tolerance,
+        )
+        npt.assert_array_equal(result, expected)
+
 
 class QartodAttenuatedSignalTest(unittest.TestCase):
     def _run_test(  # noqa: PLR0917
