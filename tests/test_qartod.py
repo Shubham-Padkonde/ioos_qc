@@ -2260,7 +2260,7 @@ def test_all_nat(testname):
     assert np.all(flags == 9)
 
 
-class QartodImpossibleDateTest:
+class QartodImpossibleDateTest(unittest.TestCase):
     def setUp(self):
         """Define the data that we're going to pass into the following tests.
 
@@ -2280,10 +2280,10 @@ class QartodImpossibleDateTest:
     def test_error_bad_datetime(self):
         #   Convert it errors out when broken timestamps are passed in.
         dt = np.array("2026-13-91T00:00:00.000")
-        with pytest.raises(ValueError, match="Could not convert object to NumPy datetime"):
+        with pytest.raises(ValueError, match="out of range"):
             qartod.impossible_date_test(tinp=dt)
         dt = np.array("2026-12-00T38:00:00.000")
-        with pytest.raises(ValueError, match="Could not convert object to NumPy datetime"):
+        with pytest.raises(ValueError, match="out of range"):
             qartod.impossible_date_test(tinp=dt)
 
     def test_future_year(self):
@@ -2298,7 +2298,7 @@ class QartodImpossibleDateTest:
         assert all(flags == 1)
 
 
-class QartodDataReceptionTest:
+class QartodDataReceptionTest(unittest.TestCase):
     def setUp(self):
         times = [
             "2026-01-12T23:05:14.000000000",
@@ -2336,7 +2336,7 @@ class QartodDataReceptionTest:
         assert type(flags) is np.ma.core.MaskedArray
 
 
-class QartodTimeGapTest:
+class QartodTimeGapTest(unittest.TestCase):
     def setUp(self):
         times = [
             "2026-01-12T23:05:14.000000000",
